@@ -1,3 +1,6 @@
+#Needed for deep copying puzzles
+import copy
+
 rows = 3
 cols = 3
 
@@ -33,20 +36,35 @@ def get_md_heuristic(puzzle):
         distance = abs(currentPos[0] - goalPos[0]) + abs(currentPos[1] - goalPos[1])
     return distance
 
-def expand_node(puzzle):
+#Function to get coordinates of valid moves
+def get_moves(puzzle):
     emptyPos = get_pos(puzzle, 0)
     newPos = []
     # Check one spot up
     if emptyPos[0]-1 >= 0:
         newPos.append((emptyPos[0]-1, emptyPos[1]))
+    # Check one spot down
     if emptyPos[0]+1 < rows:
         newPos.append((emptyPos[0]+1, emptyPos[1]))
+    # Check one spot left
     if emptyPos[1]-1 >= 0:
         newPos.append((emptyPos[0], emptyPos[1]-1))
+    # Check one spot right
     if emptyPos[1]+1 < cols:
         newPos.append((emptyPos[0], emptyPos[1]+1))
-    for i in newPos:
-        
+    return newPos
+
+#Function to make puzzles out of list of moves
+def make_moves(puzzle, moves):
+    emptyPos = get_pos(puzzle, 0)
+    puzzles = []
+    for move in moves:
+        tempPuzz = copy.deepcopy(puzzle)
+        tempPuzz[move[0]][move[1]], tempPuzz[emptyPos[0]][emptyPos[1]] = tempPuzz[emptyPos[0]][emptyPos[1]], tempPuzz[move[0]][move[1]]
+        puzzles.append(tempPuzz)
+    return puzzles
+
+
 def search(puzzle, heuristic):
 
 def default_run():
