@@ -77,10 +77,10 @@ def get_pos(puzzle, number):
 #Function to get Manhattan Distance given a puzzle 
 def get_md_heuristic(puzzle):
     distance = 0
-    for i in range((rows*cols)-1):
+    for i in range(1, (rows*cols)):
         currentPos = get_pos(puzzle, i)
         goalPos = get_pos(goal_state, i)
-        distance = abs(currentPos[0] - goalPos[0]) + abs(currentPos[1] - goalPos[1])
+        distance += abs(currentPos[0] - goalPos[0]) + abs(currentPos[1] - goalPos[1])
     return distance
 
 #Function to get coordinates of valid moves
@@ -120,11 +120,11 @@ def default_run():
     puzzle = input()
     print("Enter '1' to use uniform cost search, '2' for A* with misplaced tile, or '3' for A* with manhattan distance")
     alg = input()
-    if(alg == 1):
+    if alg == '1':
         search(given_puzzles[puzzle], get_uc_heuristic)
-    elif(alg == 2):
+    elif alg == '2':
         search(given_puzzles[puzzle], get_mt_heuristic)
-    elif(alg ==3):
+    elif alg == '3':
         search(given_puzzles[puzzle], get_md_heuristic)
 
 #Initialize a run using a user inputted puzzle. Should probably have input filtering, but I'll only add if I have time
@@ -139,21 +139,21 @@ def custom_run():
     puzzle = [list(map(int, row1.split())), list(map(int, row2.split())), list(map(int, row3.split()))]
     print("Enter '1' to use uniform cost search, '2' for A* with misplaced tile, or '3' for A* with manhattan distance")
     alg = input()
-    if(alg == 1):
-        search(given_puzzles[puzzle], get_uc_heuristic)
-    elif(alg == 2):
-        search(given_puzzles[puzzle], get_mt_heuristic)
-    elif(alg ==3):
-        search(given_puzzles[puzzle], get_md_heuristic)
+    if alg == '1':
+        search(puzzle, get_uc_heuristic)
+    elif  alg == '2':
+        search(puzzle, get_mt_heuristic)
+    elif alg == '3':
+        search(puzzle, get_md_heuristic)
 
 
 
 def main():
     print("Welcome to Peter Sullivan's CS170 Project 1. Enter '1' to use one of the puzzles provided in Dr. Keogh's handout or '2' to enter your own:")
     mode = input()
-    if mode == 1:
+    if mode == '1':
         default_run()
-    elif mode == 2:
+    elif mode == '2':
         custom_run()
     return
 
