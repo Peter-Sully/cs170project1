@@ -1,6 +1,7 @@
 #Needed for deep copying puzzles
 import copy
 
+#Class to store nodes in the search queue
 class Node:
     def __init__(self, puzzle, g, h):
         self.puzzle = puzzle
@@ -13,6 +14,8 @@ class Node:
     def __eq__(self, other):
         return self.puzzle == other.puzzle
 
+#An attempt at generality. Theres currently no way to input a bigger puzzle, but modifying these should
+#make decent steps towards working with varying size puzzles
 rows = 3
 cols = 3
 
@@ -50,9 +53,11 @@ given_puzzles = [[[1,2,3],
                   [4,6,1],
                   [3,5,8]]]
 
+#Silly UCS function to pass into search, returns 0 no matter what
 def get_uc_heuristic(puzzle):
     return 0
 
+#Function to get Misplaced Tile heuristic in a given puzzle
 def get_mt_heuristic(puzzle):
     heuristic = 0
     for i in range(rows):
@@ -61,13 +66,15 @@ def get_mt_heuristic(puzzle):
                 heuristic += 1
     return heuristic
 
+#Function to get current position of a number in a given puzzle
 def get_pos(puzzle, number):
     for row in range(rows):
         for col in range(cols):
-            if puzzle[row][col] == tile:
+            if puzzle[row][col] == number:
                 return (row, col)
     return -1
 
+#Function to get Manhattan Distance given a puzzle 
 def get_md_heuristic(puzzle):
     distance = 0
     for i in range((rows*cols)-1):
@@ -120,7 +127,7 @@ def default_run():
     elif(alg ==3):
         search(given_puzzles[puzzle], get_md_heuristic)
 
-#Initialize a run using a user inputted puzzle. Should probably have input filtering/cleaning, but I'll only add if I have time
+#Initialize a run using a user inputted puzzle. Should probably have input filtering, but I'll only add if I have time
 def custom_run():
     print("Enter your puzzle, row by row, with 0 representing the blank spot. Press enter once you have finished a row, and leave spaces in between numbers\n")
     print("Row 1:")
