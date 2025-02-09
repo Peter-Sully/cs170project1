@@ -2,7 +2,8 @@
 import copy
 #Used to represent the tree/queue
 import heapq
-
+#Used to time various runs
+import timeit
 #Class to store nodes in the search queue
 class Node:
     def __init__(self, puzzle, g, h):
@@ -121,6 +122,7 @@ def puzzle_print(puzzle):
 
 #search function
 def search(puzzle, heuristic):
+    start_time = timeit.default_timer()
     start = Node(puzzle, 0, heuristic(puzzle))
     tree = []
     heapq.heappush(tree,start)
@@ -139,10 +141,12 @@ def search(puzzle, heuristic):
 
         #Check if current state is goal, and if so exit
         if currNode.puzzle == goal_state:
+            elapsed_time = timeit.default_timer() - start_time
             print("Goal state!\n")
             print(f"Solution depth was {currNode.g}")
             print(f"Number of nodes expanded: {nodesExpanded}")
             print(f"Max queue size = {maxQueueLength}")
+            print(f"Time Taken: {elapsed_time:.3f}")
             #currently not doing anything with this return value, but could be useful if you were building upon this code
             return currNode
         
@@ -165,10 +169,6 @@ def search(puzzle, heuristic):
     #As previously mentioned, moved from the start of the start of the loop in the pseudocode
     print("Search failed.")
     return
-
-        
-        
-
 
 #Initialize a run using one of the given puzzles
 def default_run():
@@ -201,7 +201,6 @@ def custom_run():
         search(puzzle, get_mt_heuristic)
     elif alg == '3':
         search(puzzle, get_md_heuristic)
-
 
 #Begin interface
 def main():
