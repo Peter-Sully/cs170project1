@@ -1,5 +1,7 @@
 #Needed for deep copying puzzles
 import copy
+#Used to represent the tree/queue
+import heapq
 
 #Class to store nodes in the search queue
 class Node:
@@ -7,14 +9,15 @@ class Node:
         self.puzzle = puzzle
         self.g = g
         self.h = h
+        self.cost = g+h
     
     def __lt__(self, other):
-        return (self.g + self.h) < (other.g + other.h)
+        return (self.cost) < (other.cost)
     
     def __eq__(self, other):
         return self.puzzle == other.puzzle
 
-#An attempt at generality. Theres currently no way to input a bigger puzzle, but modifying these should
+#An attempt at generality. There's currently no way to input a bigger puzzle, but modifying these should
 #make decent steps towards working with varying size puzzles
 rows = 3
 cols = 3
@@ -53,7 +56,7 @@ given_puzzles = [[[1,2,3],
                   [4,6,1],
                   [3,5,8]]]
 
-#Silly UCS function to pass into search, returns 0 no matter what
+#UCS function to pass into search, returns 0 no matter what
 def get_uc_heuristic(puzzle):
     return 0
 
@@ -111,13 +114,66 @@ def make_moves(puzzle, moves):
         puzzles.append(tempPuzz)
     return puzzles
 
+#function to print out a puzzle
+def puzzle_print(puzzle):
+    for row in puzzle:
+        print(row)
 
+#search function
 def search(puzzle, heuristic):
+    start = Node(puzzle, 0, heuristic(puzzle))
+    tree = []
+    heapq.heappush(tree,start)
+    nodesExpanded = 0
+    maxQueueLength = 1
+    visited = {}
+    #converting puzzle to a tuple of tuples as lists cannot be dict keys
+    visited[tuple(map(tuple, start.puzzle))] = start.cost
+    while tree:
+        #moved fail state to outside while loop, logically equivalent but just mentioning it here since it deviates from basic search pseudocode
+        maxQueueLength = max(len(tree), maxQueueLength)
+        currNode = heapq.heappop(tree)
+        #output heavily inspired by sample report
+        print(f"The best state to expand with a g(n) = {currNode.g} and h(n) = {currNode.h} is:")
+        puzzle_print(currNode.puzzle)
+
+        #Check if current state is goal, and if so exit
+        if currNode.puzzle == goal_state:
+            print("Goal state!\n")
+            print(f"Solution depth was {currNode.g}")
+            print(f"Number of nodes expanded: {nodesExpanded}")
+            print(f"Max queue size = {maxQueueLength}")
+            #currently not doing anything with this return value, but could be useful if you were building upon this code
+            return currNode
+        
+        #Current state is not the goal, so expand current state
+        nodesExpanded += 1
+        moves = get_moves(currNode.puzzle)
+        newPuzzles = make_moves(currNode.puzzle, moves)
+        
+        #Check that all new states either havent been seen before, or are cheaper than their previous occurances
+        for puzzle in newPuzzles:
+            newG = currNode.g + 1
+            newH = heuristic(puzzle)
+            #Forgot that these puzzles arent Nodes yet, so I cant use the Node cost data member, womp womp. So calculating it here
+            newCost = newG+newH
+            puzzleTup = tuple(map(tuple, puzzle))
+            if puzzleTup not in visited or newCost < visited[puzzleTup]:
+                visited[puzzleTup] = newCost
+                newNode = Node(puzzle, newG, newH)
+                heapq.heappush(tree, newNode)
+    #As previously mentioned, moved from the start of the start of the loop in the pseudocode
+    print("Search failed.")
+    return
+
+        
+        
+
 
 #Initialize a run using one of the given puzzles
 def default_run():
     print("Enter a number from 1-7 to choose one of Dr. Keogh's given puzzles")
-    puzzle = input()
+    puzzle = int(input())-1
     print("Enter '1' to use uniform cost search, '2' for A* with misplaced tile, or '3' for A* with manhattan distance")
     alg = input()
     if alg == '1':
@@ -147,7 +203,7 @@ def custom_run():
         search(puzzle, get_md_heuristic)
 
 
-
+#Begin interface
 def main():
     print("Welcome to Peter Sullivan's CS170 Project 1. Enter '1' to use one of the puzzles provided in Dr. Keogh's handout or '2' to enter your own:")
     mode = input()
@@ -157,3 +213,4 @@ def main():
         custom_run()
     return
 
+main()
